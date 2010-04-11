@@ -3,7 +3,7 @@
   Really simple:
   
     notes new mynotename
-    
     notes search "Some String"
+    notes edit mynotename
   
   Keeps your notes in ~/Documents/Notes/%Y/%m/%d/<name>.mdown.

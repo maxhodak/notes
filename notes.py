@@ -37,6 +37,9 @@ def main(argv=None):
   
   if argv[1] == 'search':
     os.system("grep -ir '%s' ~/Documents/Notes*" % argv[2])
+  
+  if argv[1] == 'edit':
+    os.system("find ~/Documents/Notes -name '%s.mdown' -exec mate '{}' \;" % argv[2])
 
 if __name__ == "__main__":
   sys.exit(main())
