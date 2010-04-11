@@ -33,7 +33,6 @@ def main(argv=None):
   if argv[1] == 'new':
     path = "~/Documents/Notes/%s" % time.strftime("%Y/%m/%d")
     mkdir_p(path)
-    os.system("git add %s/%s.mdown" % (path, argv[2]))
     os.system("mate %s/%s.mdown" % (path, argv[2]))
   
   if argv[1] == 'search':
@@ -46,7 +45,7 @@ def main(argv=None):
     os.system("echo '.DS_Store' > ~/Documents/Notes/.gitignore")
     os.system("git init ~/Documents/Notes")
   
-  if argv[1] == 'git-add-all':
+  if argv[1] == 'add-all':
     os.system("cd ~/Documents/Notes && git add *")
   
   if argv[1] == 'commit':
