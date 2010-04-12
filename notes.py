@@ -31,12 +31,15 @@ def main(argv=None):
     sys.exit(2)
   
   if argv[1] == 'new':
-    path = "~/Documents/Notes/%s" % time.strftime("%Y/%m/%d")
+    path = "/Users/maxhodak/Documents/Notes/%s" % time.strftime("%Y/%m/%d")
     mkdir_p(path)
     os.system("mate %s/%s.mdown" % (path, argv[2]))
   
   if argv[1] == 'search':
     os.system("grep -ir '%s' ~/Documents/Notes*" % argv[2])
+  
+  if argv[1] == 'list':
+    os.system("find ~/Documents/Notes -name '*.mdown' | cut -d '/' -f 9 | cut -d '.' -f 1")
   
   if argv[1] == 'edit':
     os.system("find ~/Documents/Notes -name '%s.mdown' -exec mate '{}' \;" % argv[2])
@@ -46,10 +49,10 @@ def main(argv=None):
     os.system("git init ~/Documents/Notes")
   
   if argv[1] == 'add-all':
-    os.system("cd ~/Documents/Notes && git add *")
+    os.system("cd /Users/maxhodak/Documents/Notes && git add *")
   
   if argv[1] == 'commit':
-    os.system("cd ~/Documents/Notes && git commit -a")
+    os.system("cd /Users/maxhodak/Documents/Notes && git commit -a")
 
 if __name__ == "__main__":
   sys.exit(main())

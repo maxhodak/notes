@@ -5,6 +5,7 @@
     notes new mynotename
     notes search "Some String"
     notes edit mynotename
+    notes list
     notes git-init
     notes add-all
     notes commit
