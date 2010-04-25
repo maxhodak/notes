@@ -23,36 +23,54 @@ def touch(fname, times = None):
   with file(fname, 'a'):
     os.utime(fname, times)
 
+def display_help():
+  print "  Valid commands:"
+  print "    new <title>      Create a new note named <title> and open it in $EDITOR."
+  print "    search <query>   Full text search for <query> in your notes tree."
+  print "    list             List all titles in your notes tree."
+  print "    edit <title>     Open the note titled <title> in $EDITOR."
+  print "    git-init         (Re-)Initialize version control in your notes tree."
+  print "    git-add          Add all untracked notes to version control."
+  print "    git-commit       Commit the current state of your notes tree to version control."
+  print "    help             Display this help message and quit."
+
 def main(argv=None):
   if argv is None:
     argv = normalize_argv(sys.argv)
   
   if len(argv) < 2:
+    display_help()
     sys.exit(2)
   
   if argv[1] == 'new':
     path = "/Users/maxhodak/Documents/Notes/%s" % time.strftime("%Y/%m/%d")
     mkdir_p(path)
-    os.system("mate %s/%s.mdown" % (path, argv[2]))
+    os.system("$EDITOR %s/%s.mdown" % (path, argv[2]))
   
-  if argv[1] == 'search':
+  elif argv[1] == 'search':
     os.system("grep -ir '%s' ~/Documents/Notes*" % argv[2])
   
-  if argv[1] == 'list':
+  elif argv[1] == 'list':
     os.system("find ~/Documents/Notes -name '*.mdown' | cut -d '/' -f 9 | cut -d '.' -f 1")
   
-  if argv[1] == 'edit':
-    os.system("find ~/Documents/Notes -name '%s.mdown' -exec mate '{}' \;" % argv[2])
+  elif argv[1] == 'edit':
+    os.system("find ~/Documents/Notes -name '%s.mdown' -exec $EDITOR '{}' \;" % argv[2])
   
-  if argv[1] == 'git-init':
+  elif argv[1] == 'git-init':
     os.system("echo '.DS_Store' > ~/Documents/Notes/.gitignore")
     os.system("git init ~/Documents/Notes")
   
-  if argv[1] == 'add-all':
+  elif argv[1] == 'git-add':
     os.system("cd /Users/maxhodak/Documents/Notes && git add *")
   
-  if argv[1] == 'commit':
+  elif argv[1] == 'git-commit':
     os.system("cd /Users/maxhodak/Documents/Notes && git commit -a")
+  
+  elif argv[1] == 'help':
+    display_help()
+  
+  else:
+    display_help()
 
 if __name__ == "__main__":
   sys.exit(main())
