@@ -45,7 +45,7 @@ def main(argv=None):
   notespath = os.getenv("NOTESPATH")
   if notespath is None:
     notespath = "/Users/%s/Documents/Notes" % os.getlogin()
-    print "$NOTESPATH not set; setting default as %s" % notespath
+    print "$NOTESPATH not set; using default of %s" % notespath
     print "You should add `export NOTESPATH=%s` (or otherwise) to your shell profile." % notespath
   
   if len(argv) < 2:
@@ -72,8 +72,9 @@ def main(argv=None):
       os.system("find %s -name '%s.mdown' -exec rm '{}' \;" % (notespath, argv[2]))
   
   elif argv[1] == 'git-init':
+    mkdir_p(notespath)
     os.system("echo '.DS_Store' > %s/.gitignore" % notespath)
-    os.system("git init %s" % notespath)
+    os.system("cd %s && git init ." % notespath)
   
   elif argv[1] == 'git-add':
     os.system("cd %s && git status --porcelain -uall | grep '^??' | cut -d" " -f2 | xargs git add" % \
