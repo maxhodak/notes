@@ -28,8 +28,8 @@ def display_help():
   print "  Valid commands:"
   print "    new <title>      Create a new note named <title> and open it in $EDITOR."
   print "    search <query>   Full text search for <query> in your notes tree."
-  print "    list             List all titles in your notes tree."
-  print "    edit <title>     Open the note titled <title> in $EDITOR."
+  print "    list [-all]      List all titles in your notes tree. Optional flag -all prints full paths."
+  print "    edit <title>     Open the note named <title> in $EDITOR."
   print "    git-init         (Re-)Initialize version control in your notes tree."
   print "    git-add          Add all untracked notes to version control."
   print "    git-commit       Commit the current state of your notes tree to version control."
@@ -44,7 +44,13 @@ def main(argv=None):
   
   notespath = os.getenv("NOTESPATH")
   if notespath is None:
-    notespath = "/Users/%s/Documents/Notes" % os.getlogin()
+    if sys.platform in ("darwin"):
+      notespath = "/Users/%s/Documents/Notes" % os.getlogin()
+    elif sys.platform in ("linux2"):
+      notespath = "/home/%s/notes" % os.getlogin()
+    else:
+      print "Platform not recognized and $NOTESPATH not set.  Please set $NOTESPATH first."
+      sys.exit(2)
     print "$NOTESPATH not set; using default of %s" % notespath
     print "You should add `export NOTESPATH=%s` (or otherwise) to your shell profile." % notespath
   
@@ -61,7 +67,13 @@ def main(argv=None):
     os.system("grep -ir '%s' %s*" % (argv[2], notespath))
   
   elif argv[1] == 'list':
-    os.system("find %s -name '*.mdown' | cut -d '/' -f 9 | cut -d '.' -f 1" % notespath)
+    if len(argv) > 2:
+      if argv[2] == '-all':
+        os.system("find %s -name '*.mdown'" % notespath)
+      else:
+        print "Invalid flag: %s" % argv[2]
+    else:
+      os.system("find %s -name '*.mdown' | cut -d '/' -f 9 | cut -d '.' -f 1" % notespath)
   
   elif argv[1] == 'edit':
     os.system("find %s -name '%s.mdown' -exec $EDITOR '{}' \;" % (notespath, argv[2]))

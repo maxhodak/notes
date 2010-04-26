@@ -14,4 +14,6 @@
     notes git-status
     notes help
   
-  Keeps your notes in $NOTESPATH/%Y/%m/%d/<name>.mdown; if not set, $NOTESPATH defaults to /Users/<username>/Documents/Notes/.  `note` is aliased to `notes`, so you can use either.
+  Keeps your notes in $NOTESPATH/%Y/%m/%d/<name>.mdown; if not set, $NOTESPATH defaults to either /Users/&lt;username&gt;/Documents/Notes/ or /home/&lt;username&gt;/notes, depending on platform.
+  
+  Notes creates a symlink aliasing `note` to `notes`, so you can use either; some of the commands just feel more natural after 'note', singular.
