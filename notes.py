@@ -89,7 +89,7 @@ def main(argv=None):
     os.system("cd %s && git init ." % notespath)
   
   elif argv[1] == 'git-add':
-    os.system("cd %s && git status --porcelain -uall | grep '^??' | cut -d" " -f2 | xargs git add" % \
+    os.system("cd %s && git status --porcelain -uall | grep '^??' | cut -d' ' -f2 | xargs git add" % \
                 notespath)
   
   elif argv[1] == 'git-log':
