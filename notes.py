@@ -36,7 +36,7 @@ def display_help():
   print "    git-log          View your version control commit log in $PAGER."
   print "    git-status       See the status of your notes tree with respect to unversioned changes."
   print "    help             Display this help message and quit."
-  print "  Notes is maintained by Max Hodak <max@myfit.com>.  Please report issues at http://github.com/maxhodak/notes/issues/."
+  print "  Notes is maintained by Max Hodak <max@maxhodak.com>.  Please report issues at http://github.com/maxhodak/notes/issues/."
 
 def main(argv=None):
   if argv is None:
