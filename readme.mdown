@@ -42,7 +42,7 @@ To add a new item:
 
     $ note push Adding a new item!
 
-appends it.  It's not *really* a stack, because it's not *strictly* FIFO.  To remove an item,
+appends it.  It's not *really* a stack, because it's not *strictly* LIFO.  To remove an item,
 
     $ note pop 2
 
