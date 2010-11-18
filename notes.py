@@ -4,7 +4,7 @@
 A Python script for keeping track of Markdown-based notes.
 """
 
-import sys, os, time, errno
+import sys, os, time, errno, json
 
 def normalize_argv(argv):
   if argv[0] is 'python':
@@ -25,20 +25,37 @@ def touch(fname, times = None):
 
 def display_help():
   print "  Editor is %s, pager is %s." % (os.getenv('EDITOR'), os.getenv('PAGER'))
+  print ""
   print "  Valid commands:"
   print "    new <title>      Create a new note named <title> and open it in $EDITOR."
+  print "    cat <title>      Display the content of <title> in $PAGER."
   print "    search <query>   Full text search for <query> in your notes tree."
   print "    list [-all]      List all titles in your notes tree. Optional flag -all prints full paths."
   print "    edit <title>     Open the note named <title> in $EDITOR."
+  print ""
+  print "    stack            View the current micronote stack."
+  print "    push <unote>     Push a micronote onto the active stack."
+  print "    pop <idx>        Unset the micronote at position idx."
+  print ""
   print "    git-init         (Re-)Initialize version control in your notes tree."
-  print "    git-add          Add all untracked notes to version control."
   print "    git-commit       Commit the current state of your notes tree to version control."
   print "    git-log          View your version control commit log in $PAGER."
   print "    git-status       See the status of your notes tree with respect to unversioned changes."
+  print ""
   print "    help             Display this help message and quit."
+  print ""
   print "  Notes is maintained by Max Hodak <max@maxhodak.com>.  Please report issues at http://github.com/maxhodak/notes/issues/."
 
-def main(argv=None):
+def load_stack(notespath):
+  try:
+    return json.load(open("%s/.notestack" % notespath, 'r+'))
+  except ValueError:
+    return []
+
+def save_stack(notespath, stack = []):
+  return json.dump(stack, open("%s/.notestack" % notespath, 'w'))
+
+def main(argv = None):
   if argv is None:
     argv = normalize_argv(sys.argv)
   
@@ -51,6 +68,7 @@ def main(argv=None):
     else:
       print "Platform not recognized and $NOTESPATH not set.  Please set $NOTESPATH first."
       sys.exit(2)
+    os.system("touch %s/.notestack" % notespath)
     print "$NOTESPATH not set; using default of %s" % notespath
     print "You should add `export NOTESPATH=%s` (or otherwise) to your shell profile." % notespath
   
@@ -58,10 +76,31 @@ def main(argv=None):
     display_help()
     sys.exit(2)
   
-  if argv[1] == 'new':
+  if argv[1] == 'stack':
+    stack = load_stack(notespath)
+    for i in xrange(len(stack)):
+      print " ==> [%i] %s" % (i, stack[i])
+  
+  elif argv[1] == 'push':
+    stack = load_stack(notespath)
+    stack.append(" ".join(argv[2:]))
+    save_stack(notespath, stack)
+  
+  elif argv[1] == 'pop':
+    stack = load_stack(notespath)
+    if int(argv[2]) > 0 and int(argv[2]) <= len(stack):
+      del stack[int(argv[2])]
+      save_stack(notespath, stack)
+    else:
+      print "Error!"
+  
+  elif argv[1] == 'new':
     path = "%s/%s" % (notespath,time.strftime("%Y/%m/%d"))
     mkdir_p(path)
     os.system("$EDITOR %s/%s.mdown" % (path, argv[2]))
+  
+  elif argv[1] == 'cat':
+    os.system("find %s -name '%s.mdown' -exec $PAGER '{}' \;" % (notespath, argv[2]))
   
   elif argv[1] == 'search':
     os.system("grep -ir '%s' %s*" % (argv[2], notespath))
@@ -88,10 +127,6 @@ def main(argv=None):
     os.system("echo '.DS_Store' > %s/.gitignore" % notespath)
     os.system("cd %s && git init ." % notespath)
   
-  elif argv[1] == 'git-add':
-    os.system("cd %s && git status --porcelain -uall | grep '^??' | cut -d' ' -f2 | xargs git add" % \
-                notespath)
-  
   elif argv[1] == 'git-log':
     os.system("cd %s && git log" % notespath)
   
@@ -99,6 +134,8 @@ def main(argv=None):
     os.system("cd %s && git status -uall" % notespath)
   
   elif argv[1] == 'git-commit':
+    os.system("cd %s && git status --porcelain -uall | grep '^??' | cut -d' ' -f2 | xargs git add" % \
+                notespath)
     commit_msg = raw_input("Commit log message: ")
     os.system("cd %s && git commit -am '%s'" % (notespath, commit_msg))
   
