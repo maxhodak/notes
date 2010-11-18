@@ -1,19 +1,61 @@
 # Notes
 
-  Really simple:
-  
-    notes new mynotename
-    notes search "Some String"
-    notes edit mynotename
-    notes delete mynotename
-    notes list
+## Basic Use: Keeping track of notes
+
+A note is just a textfile identified by a name.  To create a new note,
+
+    $ notes new mynote
+
+and your editor will open with a blank file.  Save will commit to disk in the right place.  Once you've created a note, you can re-open it with
+
+    $ notes edit mynotename
+
+Note that `edit` and `new` are two different things!  Under the hood, notes keep track of metadata like creation date and `new` will create a `new` file under the current day's directory.  If you have multiple notes with the same name from different days, in the future you'll get a disambiguation prompt (today it just pulls out the oldest).  Notes does not support multiple notes with same name on the same day.
+
+To search your existing notes for a string:
+
+    $ notes search "Some String"
+
+You can also delete a note:
+
+    $ notes delete mynotename
+
+though make sure you're using the version control features properly unless you really want to lose data!
+
+Finally, to get a list of all of your notes, you can use:
+
+    $ notes list
+
+the long form of the list command, `notes list -all` is especially useful for piping to other command that operate on your notefiles.
+
+## Micronotes: miniature task tracking and reminders
+
+Programmers often refer to having a mental stack.
+
+    $ note stack
+    
+    ==> [0] Get correct answers for BME 153 homework
+    ==> [1] Go running
+    ==> [2] Send back to proposal for Widgets
+
+To add a new item:
+
+    $ note push Adding a new item!
+
+appends it.  It's not *really* a stack, because it's not *strictly* FIFO.  To remove an item,
+
+    $ note pop 2
+
+removes the item at position 2 (see the numbers in brackets to the right of the arrows above?)
+
+## Version Control
+
     notes git-init
     notes git-add
     notes git-commit
     notes git-log
     notes git-status
-    notes help
-  
-  Keeps your notes in $NOTESPATH/%Y/%m/%d/<name>.mdown; if not set, $NOTESPATH defaults to either /Users/&lt;username&gt;/Documents/Notes/ or /home/&lt;username&gt;/notes, depending on platform.
-  
-  Notes creates a symlink aliasing `note` to `notes`, so you can use either; some of the commands just feel more natural after 'note', singular.
+
+## Other
+
+Keeps your notes in `$NOTESPATH/%Y/%m/%d/<name>.mdown`; if not set, `$NOTESPATH` defaults to either `/Users/&lt;username&gt;/Documents/Notes/` or `/home/&lt;username&gt;/notes`, depending on platform.  Notes also creates a symlink aliasing `note` to `notes`, so you can use either; some of the commands just feel more natural after 'note', singular.
