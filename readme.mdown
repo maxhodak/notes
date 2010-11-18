@@ -56,6 +56,32 @@ removes the item at position 2 (see the numbers in brackets to the right of the 
     notes git-log
     notes git-status
 
+## Full Usage
+
+(For my setup, where I'm using TextMate and less.)
+
+    $ notes help
+
+    Editor is mate, pager is less.
+
+    Valid commands:
+      new <title>      Create a new note named <title> and open it in $EDITOR.
+      cat <title>      Display the content of <title> in $PAGER.
+      search <query>   Full text search for <query> in your notes tree.
+      list [-all]      List all titles in your notes tree. Optional flag -all prints full paths.
+      edit <title>     Open the note named <title> in $EDITOR.
+
+      stack            View the current micronote stack.
+      push <unote>     Push a micronote onto the active stack.
+      pop <idx>        Unset the micronote at position idx.
+
+      git-init         (Re-)Initialize version control in your notes tree.
+      git-commit       Commit the current state of your notes tree to version control.
+      git-log          View your version control commit log in $PAGER.
+      git-status       See the status of your notes tree with respect to unversioned changes.
+
+      help             Display this help message and quit.
+
 ## Other
 
 Keeps your notes in `$NOTESPATH/%Y/%m/%d/<name>.mdown`; if not set, `$NOTESPATH` defaults to either `/Users/&lt;username&gt;/Documents/Notes/` or `/home/&lt;username&gt;/notes`, depending on platform.  Notes also creates a symlink aliasing `note` to `notes`, so you can use either; some of the commands just feel more natural after 'note', singular.
