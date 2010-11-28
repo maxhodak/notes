@@ -10,9 +10,16 @@ and your editor will open with a blank file.  Save will commit to disk in the ri
 
     $ notes edit mynotename
 
-Note that `edit` and `new` are two different things!  Under the hood, notes keep track of metadata like creation date and `new` will create a `new` file under the current day's directory.  If you have multiple notes with the same name from different days, in the future you'll get a disambiguation prompt (today it just pulls out the oldest).  Notes does not support multiple notes with same name on the same day.
+Note that `edit` and `new` are two different things!  Under the hood, notes keep track of metadata like creation date and `new` will create a `new` file under the current day's directory.  If you have multiple notes with the same name from different days, you'll get a disambiguation prompt:
 
-To search your existing notes for a string:
+    Multiple matches for mynotename found:
+      idx   enc    Name
+       0    False  /Users/maxhodak/Documents/Notes/2010/11/03/mynotename.mdown
+       1    True   /Users/maxhodak/Documents/Notes/2010/11/28/mynotename.mdown
+
+      Select an index: 
+
+Notes does not support multiple notes with same name on the same day.  To search your existing notes for a string:
 
     $ notes search "Some String"
 
@@ -20,7 +27,7 @@ You can also delete a note:
 
     $ notes delete mynotename
 
-though make sure you're using the version control features properly unless you really want to lose data!
+though make sure you're using the version control features properly unless you really want to lose data.
 
 Finally, to get a list of all of your notes, you can use:
 
@@ -56,31 +63,53 @@ removes the item at position 2 (see the numbers in brackets to the right of the 
     notes git-log
     notes git-status
 
+## Security
+
+Notes supports security protocols involving encryption of notes, journalling, and tracked data.  The current implementation uses AES-256 with a different 256-bit key for each object (note, journal entry, or datum).  In the future, this may change to a public key-based scheme in order to allow easier access to the entire object set (for example, `search` only currently searches over unencrypted objects).  To create a protected object, use the -e flag:
+
+    notes new -e mynote
+    notes journal -e
+
+Currently, the AES IVs are generated using python's randint, which are NOT cryptographically strong.  The AES implementation is from PyCrypto (http://www.dlitz.net/software/pycrypto/).
+
 ## Full Usage
 
 (For my setup, where I'm using TextMate and less.)
 
     $ notes help
 
-    Editor is mate, pager is less.
+     Editor is mate (secure: vim), pager is less.
 
-    Valid commands:
-      new <title>      Create a new note named <title> and open it in $EDITOR.
-      cat <title>      Display the content of <title> in $PAGER.
-      search <query>   Full text search for <query> in your notes tree.
-      list [-all]      List all titles in your notes tree. Optional flag -all prints full paths.
-      edit <title>     Open the note named <title> in $EDITOR.
+     Usage: /usr/bin/notes [COMMAND]
 
-      stack            View the current micronote stack.
-      push <unote>     Push a micronote onto the active stack.
-      pop <idx>        Unset the micronote at position idx.
+     Valid commands:
+       new <title> [-e]     Create a new note named <title> and open it in $EDITOR.
+       cat <title>          Display the content of <title> in $PAGER.
+       search <query>       Full text search for <query> in your notes tree.
+       list [-all]          List all titles in your notes tree. Optional flag -all prints full paths.
+       edit <title>         Open the note named <title> in $EDITOR.
 
-      git-init         (Re-)Initialize version control in your notes tree.
-      git-commit       Commit the current state of your notes tree to version control.
-      git-log          View your version control commit log in $PAGER.
-      git-status       See the status of your notes tree with respect to unversioned changes.
+       track                Log data for tracking.
 
-      help             Display this help message and quit.
+       journal  [-e]        Create a new journal entry.
+       journal read         Open the journal file.
+
+       stack                View the current micronote stack.
+       push <unote>         Push a micronote onto the active stack.
+       pop <idx>            Unset the micronote at position idx.
+
+       git-init             (Re-)Initialize version control in your notes tree.
+       git-commit           Commit the current state of your notes tree to version control.
+       git-log              View your version control commit log in $PAGER.
+       git-status           See the status of your notes tree with respect to unversioned changes.
+
+       help                 Display this help message and quit.
+
+    Optional arguments:
+       -e                   Encrypt using AES-256 with a 256 bit key.  Valid for: new, journal.
+       -all                 Print full paths.  Valid for: list.
+
+     Notes is maintained by Max Hodak <maxhodak@gmail.com>.  Please report issues at http://github.com/maxhodak/notes/issues/.
 
 ## Other
 
