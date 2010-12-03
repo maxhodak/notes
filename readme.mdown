@@ -55,6 +55,99 @@ appends it.  It's not *really* a stack, because it's not LIFO.  To remove an ite
 
 removes the item at position 2 (see the numbers in brackets to the right of the arrows above?)
 
+## Tracking: track any data of interest
+
+Live better through data.  "Personal metrics" refers to the idea that by tracking things about yourself and your daily life, you can be more productive, healthier, and do "better" for your arbitrary definition of "better".  Do you really concentrate better with coffee?  Is there an optimal amount of coffee to consume?  How does that vary with time-of-day?  What about when you bring exercise into the equation?
+
+Examples:
+
+    log workout from 5:30am to 7am with fb:jason fb:kevin
+    log weight 158 lbs on 5/3/2010 :tag1 :hashtag2
+
+On the CLI, you need to use : to mark hashtags.  Otherwise, use #.  This is because # has other meanings in bash, zsh, and friends while : doesn't.  You can put hashtags anywhere in your log message, so:
+
+    log movie :sometag from 7:15pm :anothertag to 9:45pm with :3rdtag fb:foobar fb:quux :mytag
+
+is terrible, but legal.  The meaning of a tag doesn't vary based on where it appears; it works like they're stripped out before the message is parsed.
+
+### Tracking Internal Data Representation ("Semantics")
+
+Every field except for `event`, `when/began`, `time_created`, and `time_updated` MAY be omitted; `time_created` and `time_updated` MUST be automatically calculated rather than be user-changeable, by the RFC 2119 meanings of MUST and MAY.
+
+    {
+      "event": Label of the event being recorded,
+      "value": {
+        "content": String or numerical value,
+        "units": String units for the value content.
+      },
+      "tags": {
+        A list of tags for this event. These are categorical markers for the kind of event rather than event parameters.
+      },
+      "with": {
+        A list of strong (RDF-style) identifiers for other people involved with this event.
+        Good identity providers for strong URIs include  Facebook, Twitter, and email addresses, among more; use common sense.
+        Whenever possible, use Facebook for IDs since that will minimize the number of same-as references that will need to be
+        traversed later.
+      },
+      "when": {
+        "began": Time began with timezone (required),
+        "ended": Time ended with timezone (may be omitted; in the case of an instantaneous event, only include a began time)
+      },
+      "where": {
+        "lat": An optional latitude for the location,
+        "long": An optional longitude for the location,
+        "label": An optional label (starbucks, stanford library, university cafe) for the location
+      },
+      "time_created": Time created with timezone,
+      "time_updated": Time last updated with timezone
+    }
+
+So, for example:
+
+    {
+      "event": "myevent",
+      "value": {
+        "content": 2,
+        "units": "internets"
+      },
+      "tags": [
+        "foo", "bar", "quux"
+      ],
+      "when": {
+        "began": "2010-05-06T05:30:00",
+        "ended": "2010-05-06T07:00:00"
+      },
+      "with": [
+        "fb:jasonmueller",
+        "twttr:kevzettler",
+        "fb:100120203012"
+      ],
+      "where": {
+        "label": "starbucks"
+      },
+      "time_created": "2010-05-06T19:11:45.915615",
+      "time_updated": "2010-05-06T19:11:45.915622"
+    }
+
+### Tracking DSL
+
+The basic grammar is:
+
+    notes track <event-value-stmt> <opt-date-stmt> <opt-time-stmt> <opt-with-stmt> <opt-at-stmt>
+                <event-value-stmt> := <event_name> <opt-units>
+                   <opt-date-stmt> := 'on' <date-str>
+                   <opt-time-stmt> := 'from' <time-of-day> <opt-to-stmt>
+                     <opt-to-stmt> := 'to' <time-of-day>
+                   <opt-with-stmt> := 'with' <with-list>
+                       <with-list> := <friend-name> | <with-list> <friend-name>
+                     <opt-at-stmt> := 'at' <location-name>
+
+### Tracking Templates
+
+You can define templates for fields that you collect often or as a group.  For example, you might define a template `running` which includes fields `duration`, `distance`, `heartrate`, `trail`, and `with`.
+
+Idea: Make the DSL grammar itself extensible?
+
 ## Version Control
 
     notes git-init
@@ -89,7 +182,7 @@ Currently, the AES IVs are generated using python's randint, which are NOT crypt
        list [-all]          List all titles in your notes tree. Optional flag -all prints full paths.
        edit <title>         Open the note named <title> in $EDITOR.
 
-       track                Log data for tracking.
+       track <expr>         Log data for tracking.
 
        journal  [-e]        Create a new journal entry.
        journal read         Open the journal file.

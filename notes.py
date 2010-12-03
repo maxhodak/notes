@@ -4,7 +4,7 @@
 A Python script for keeping track of Markdown-based notes.
 """
 
-import sys, os, time, errno, json, subprocess, tempfile, getpass, marshal, random
+import sys, os, time, errno, json, subprocess, tempfile, getpass, marshal, random, datetime
 
 ENCR = True
 
@@ -27,6 +27,39 @@ if notespath is None:
   os.system("touch %s/.notestack" % notespath)
   print "$NOTESPATH not set; using default of %s" % notespath
   print "You should add `export NOTESPATH=%s` (or otherwise) to your shell profile." % notespath
+
+def mkdir_p(path):
+  try:
+    os.makedirs(path)
+  except OSError as exc:
+    if exc.errno == errno.EEXIST:
+      pass
+    else: raise
+
+def touch(fname, times = None):
+  with file(fname, 'a'):
+    os.utime(fname, times)
+
+def vim_journal():
+  tf = tempfile.NamedTemporaryFile(mode='w', delete = False)
+  subprocess.call(["vim", tf.name])
+  with open(tf.name) as tfd:
+    data = tfd.read()
+    with open("%s/journal.mdown" % notespath, 'a+') as fd:
+      text = "%s: %s\n" % (time.strftime("%d/%m/%Y %H:%M", time.gmtime()), data)
+      fd.write(text)
+  os.unlink(tf.name)
+
+def trackfile_append(datum):
+  touch("%s/trackfile.json" % notespath)
+  with open("%s/trackfile.json" % notespath, 'r') as fd:
+    try:
+      db = json.load(fd)
+    except ValueError, err:
+      db = [] # this is dangerous...
+    db.append(datum)
+  with open("%s/trackfile.json" % notespath, 'w+') as fd:
+    json.dump(db, fd)
 
 def normalize_argv(argv):
   if argv[0] is 'python':
@@ -101,17 +134,127 @@ def find_note_by_name(name):
     return ret[int(selection)]
   return ret[0]
 
-def mkdir_p(path):
-  try:
-    os.makedirs(path)
-  except OSError as exc:
-    if exc.errno == errno.EEXIST:
-      pass
-    else: raise
+datetime_patterns = [
+  "%d/%m/%Y %I:%M%p",
+  "%d/%m/%y %I:%M%p",
+  "%d/%m/%y %I%p",
+  "%d/%m/%Y %I%p",
+  "%d/%m/%y",
+  "%d/%m/%Y",
+  "%m/%d/%Y %I:%M%p",
+  "%m/%d/%y %I:%M%p",
+  "%m/%d/%y %I%p",
+  "%m/%d/%Y %I%p",
+  "%m/%d/%y",
+  "%m/%d/%Y"
+]
 
-def touch(fname, times = None):
-  with file(fname, 'a'):
-    os.utime(fname, times)
+if len(sys.argv) > 0:
+  hash_char = ':'
+else:
+  hash_char = '#'
+
+def event_statement(tokl):
+  return tokl[0]
+
+def value_statement(tokl):
+  content = None
+  units = None
+  for ii in xrange(len(tokl)):
+    if tokl[ii] not in keywords.keys() and content is None:
+      content = tokl[ii]
+    elif tokl[ii] not in keywords.keys() and content is not None:
+      units = tokl[ii]
+    if tokl[ii] in keywords.keys() or ii == len(tokl)-1:
+      return {'content': content, 'units': units}
+
+def date_statement(tokl):
+  return tokl[0]
+
+def time_statement(tokl):
+  from_t = tokl[0]
+  to = None
+  for ii in xrange(len(tokl)):
+    if tokl[ii] == 'to':
+      to = tokl[ii+1]
+    if tokl[ii] in keywords.keys() or ii == len(tokl)-1:
+      return (from_t, to)
+
+def with_statement(tokl):
+  with_t = []
+  for ii in xrange(len(tokl)):
+    if tokl[ii] not in keywords.keys():
+      with_t.append(tokl[ii])
+    if tokl[ii] in keywords.keys() or ii == len(tokl)-1:
+      return with_t
+
+def at_statement(tokl):
+  return {"label": tokl[0]}
+
+def date_time_into_when(ast):
+  date = None
+  ret = {}
+  if 'on' in ast.keys():
+    date = ast['on']
+    del ast['on']
+  else:
+    date = datetime.datetime.now().strftime("%d/%m/%y")
+  if 'from' in ast.keys():
+    for pattern in datetime_patterns:
+      try:
+        ret['began'] = datetime.datetime.strptime(date+" " + ast['from'][0], pattern).isoformat()
+        break
+      except ValueError, err:
+        pass
+    if ast['from'][1] is not None:
+      for pattern in datetime_patterns:
+        try:
+          ret['ended'] = datetime.datetime.strptime(date+" " + ast['from'][1], pattern).isoformat()
+          break
+        except ValueError, err:
+          pass
+    del ast['from']
+  else:
+    for pattern in datetime_patterns:
+      try:
+        ret['began'] = datetime.datetime.strptime(date, pattern).isoformat()
+        break
+      except ValueError, err:
+        pass
+  return ret
+
+def detag(tokl):
+  tokl_detagged = []
+  tags = []
+  for yy in tokl:
+    if yy[0] == hash_char:
+      tags.append(yy[1:])
+    else:
+      tokl_detagged.append(yy)
+  return (tags, tokl_detagged)
+
+keywords = {
+  "on": date_statement,
+  "from": time_statement,
+  "with": with_statement,
+  "at": at_statement
+}
+
+def parse(tokl):
+  (tags, tokl) = detag(tokl)
+  ast = {'tags': tags,
+         'event': event_statement(tokl),
+         'value': value_statement(tokl[1:]),
+         'source': " ".join(tokl)}
+  for ii in range(len(tokl)):
+    shift = tokl[ii+1:]
+    if tokl[ii] in keywords.keys():
+      ast[tokl[ii]] = keywords[tokl[ii]](shift)
+  ast['when'] = date_time_into_when(ast)
+  if 'at' in ast.keys():
+    ast['where'] = ast['at']
+    del ast['at']
+  return ast
 
 def display_help(argv = sys.argv):
   print "  Editor is %s (secure: vim), pager is %s." % (os.getenv('EDITOR'), os.getenv('PAGER'))
@@ -119,31 +262,35 @@ def display_help(argv = sys.argv):
   print "  Usage: %s [COMMAND]" % argv[0]
   print ""
   print "  Valid commands:"
-  print "    new <title> [-e]     Create a new note named <title> and open it in $EDITOR."
-  print "    cat <title>          Display the content of <title> in $PAGER."
-  print "    search <query>       Full text search for <query> in your notes tree."
-  print "    list [-all]          List all titles in your notes tree. Optional flag -all prints full paths."
-  print "    edit <title>         Open the note named <title> in $EDITOR."
+  print "    new <title> [-e]       Create a new note named <title> and open it in $EDITOR."
+  print "    cat <title>            Display the content of <title> in $PAGER."
+  print "    search <query>         Full text search for <query> in your notes tree."
+  print "    list [-all]            List all titles in your notes tree. Optional flag -all prints full paths."
+  print "    edit <title>           Open the note named <title> in $EDITOR."
   print ""
-  print "    track                Log data for tracking."
+  print "    track <expr,templ>     Log data for tracking."
   print ""
-  print "    journal  [-e]        Create a new journal entry."
-  print "    journal read         Open the journal file."
+  print "    journal                Create a new journal entry."
+  print "    journal read           Open the journal file."
   print ""
-  print "    stack                View the current micronote stack."
-  print "    push <unote>         Push a micronote onto the active stack."
-  print "    pop <idx>            Unset the micronote at position idx."
+  print "    protect journal [-u]   Encrypt the journalfile. UNIMPLEMENTED."
+  print "    protect <title> [-u]   Encrypt the note titled <title>. UNIMPLEMENTED."
   print ""
-  print "    git-init             (Re-)Initialize version control in your notes tree."
-  print "    git-commit           Commit the current state of your notes tree to version control."
-  print "    git-log              View your version control commit log in $PAGER."
-  print "    git-status           See the status of your notes tree with respect to unversioned changes."
+  print "    stack                  View the current micronote stack.  Short form: s."
+  print "    push <unote>           Push a micronote onto the active stack."
+  print "    pop <idx>              Unset the micronote at position idx."
   print ""
-  print "    help                 Display this help message and quit."
+  print "    git-init               (Re-)Initialize version control in your notes tree."
+  print "    git-commit             Commit the current state of your notes tree to version control."
+  print "    git-log                View your version control commit log in $PAGER."
+  print "    git-status             See the status of your notes tree with respect to unversioned changes."
+  print ""
+  print "    help                   Display this help message and quit."
   print ""
   print " Optional arguments:"
-  print "    -e                   Encrypt using AES-256 with a 256 bit key.  Valid for: new, journal."
-  print "    -all                 Print full paths.  Valid for: list."
+  print "    -e                     Encrypt using AES-256 with a 256 bit key.  Valid for: new."
+  print "    -u                     Undo protection.  Does reverse of operation description."
+  print "    -all                   Print full paths.  Valid for: list."
   print ""
   print "  Notes is maintained by Max Hodak <maxhodak@gmail.com>.  Please report issues at http://github.com/maxhodak/notes/issues/."
 
@@ -184,6 +331,13 @@ def main(argv = None):
       save_stack(notespath, stack)
     else:
       print "Error!"
+  
+  elif argv[1] == 'journal':
+    if len(argv) > 2:
+      if argv[2] == 'read':
+        os.system("$PAGER %s/journal.mdown" % notespath)
+    else:
+      vim_journal()
   
   elif argv[1] == 'new':
     path = "%s/%s" % (notespath,time.strftime("%Y/%m/%d"))
@@ -245,6 +399,16 @@ def main(argv = None):
           os.system("rm %s" % fname)
         except IOError, err:
           print "Error: %s", str(err)
+  
+  elif argv[1] == 'track':
+    ast = parse(argv[2].split(" "))
+    ast['time_created'] = datetime.datetime.now().isoformat()
+    ast['time_updated'] = datetime.datetime.now().isoformat()
+    trackfile_append(ast)
+    print "Saved."
+  
+  elif argv[1] == 'protect':
+    print "Error: Unimplemented functionality!"
   
   elif argv[1] == 'git-init':
     mkdir_p(notespath)
