@@ -382,11 +382,11 @@ def main(argv = None):
   elif argv[1] == 'list':
     if len(argv) > 2:
       if argv[2] == '-all':
-        os.system("find %s -name '*.mdown'" % notespath)
+        os.system("find %s/2* -name '*.mdown'" % notespath)
       else:
         print "Invalid flag: %s" % argv[2]
     else:
-      os.system("find %s -name '*.mdown' | cut -d '/' -f 9 | cut -d '.' -f 1" % notespath)
+      os.system("find %s/2* -name '*.mdown' | cut -d '/' -f 9 | cut -d '.' -f 1" % notespath)
   
   elif argv[1] == 'delete':
     (fname, enc) = find_note_by_name(argv[2])
