@@ -17,7 +17,7 @@ Note that `edit` and `new` are two different things!  Under the hood, notes keep
        0    False  /Users/maxhodak/Documents/Notes/2010/11/03/mynotename.mdown
        1    True   /Users/maxhodak/Documents/Notes/2010/11/28/mynotename.mdown
 
-      Select an index: 
+      Select an index:
 
 Notes does not support multiple notes with same name on the same day.  To search your existing notes for a string:
 
@@ -33,14 +33,14 @@ Finally, to get a list of all of your notes, you can use:
 
     $ notes list
 
-the long form of the list command, `notes list -all` is especially useful for piping to other command that operate on your notefiles.
+the long form of the list command, `notes list -a` is especially useful for piping to other command that operate on your notefiles.
 
-## Micronotes: miniature task tracking and reminders
+## Stack: miniature task tracking and reminders
 
 Programmers often refer to having a mental stack.
 
     $ note stack
-    
+
     ==> [0] Get correct answers for BME 153 homework
     ==> [1] Go running
     ==> [2] Send back to proposal for Widgets
@@ -49,104 +49,15 @@ To add a new item:
 
     $ note push Adding a new item!
 
-appends it.  It's not *really* a stack, because it's not LIFO.  To remove an item,
+appends it.  To remove an item,
+
+    $ note pop
+
+removes the most-recently-inserted item. You can also specify a position:
 
     $ note pop 2
 
-removes the item at position 2 (see the numbers in brackets to the right of the arrows above?)
-
-## Tracking: track any data of interest
-
-Live better through data.  "Personal metrics" refers to the idea that by tracking things about yourself and your daily life, you can be more productive, healthier, and do "better" for your arbitrary definition of "better".  Do you really concentrate better with coffee?  Is there an optimal amount of coffee to consume?  How does that vary with time-of-day?  What about when you bring exercise into the equation?
-
-Examples:
-
-    log workout from 5:30am to 7am with fb:jason fb:kevin
-    log weight 158 lbs on 5/3/2010 :tag1 :hashtag2
-
-On the CLI, you need to use : to mark hashtags.  Otherwise, use #.  This is because # has other meanings in bash, zsh, and friends while : doesn't.  You can put hashtags anywhere in your log message, so:
-
-    log movie :sometag from 7:15pm :anothertag to 9:45pm with :3rdtag fb:foobar fb:quux :mytag
-
-is terrible, but legal.  The meaning of a tag doesn't vary based on where it appears; it works like they're stripped out before the message is parsed.
-
-### Tracking Internal Data Representation ("Semantics")
-
-Every field except for `event`, `when/began`, `time_created`, and `time_updated` MAY be omitted; `time_created` and `time_updated` MUST be automatically calculated rather than be user-changeable, by the RFC 2119 meanings of MUST and MAY.
-
-    {
-      "event": Label of the event being recorded,
-      "value": {
-        "content": String or numerical value,
-        "units": String units for the value content.
-      },
-      "tags": {
-        A list of tags for this event. These are categorical markers for the kind of event rather than event parameters.
-      },
-      "with": {
-        A list of strong (RDF-style) identifiers for other people involved with this event.
-        Good identity providers for strong URIs include  Facebook, Twitter, and email addresses, among more; use common sense.
-        Whenever possible, use Facebook for IDs since that will minimize the number of same-as references that will need to be
-        traversed later.
-      },
-      "when": {
-        "began": Time began with timezone (required),
-        "ended": Time ended with timezone (may be omitted; in the case of an instantaneous event, only include a began time)
-      },
-      "where": {
-        "lat": An optional latitude for the location,
-        "long": An optional longitude for the location,
-        "label": An optional label (starbucks, stanford library, university cafe) for the location
-      },
-      "time_created": Time created with timezone,
-      "time_updated": Time last updated with timezone
-    }
-
-So, for example:
-
-    {
-      "event": "myevent",
-      "value": {
-        "content": 2,
-        "units": "internets"
-      },
-      "tags": [
-        "foo", "bar", "quux"
-      ],
-      "when": {
-        "began": "2010-05-06T05:30:00",
-        "ended": "2010-05-06T07:00:00"
-      },
-      "with": [
-        "fb:jasonmueller",
-        "twttr:kevzettler",
-        "fb:100120203012"
-      ],
-      "where": {
-        "label": "starbucks"
-      },
-      "time_created": "2010-05-06T19:11:45.915615",
-      "time_updated": "2010-05-06T19:11:45.915622"
-    }
-
-### Tracking DSL
-
-The basic grammar is:
-
-    notes track <event-value-stmt> <opt-date-stmt> <opt-time-stmt> <opt-with-stmt> <opt-at-stmt>
-                <event-value-stmt> := <event_name> <opt-units>
-                   <opt-date-stmt> := 'on' <date-str>
-                   <opt-time-stmt> := 'from' <time-of-day> <opt-to-stmt>
-                     <opt-to-stmt> := 'to' <time-of-day>
-                   <opt-with-stmt> := 'with' <with-list>
-                       <with-list> := <friend-name> | <with-list> <friend-name>
-                     <opt-at-stmt> := 'at' <location-name>
-
-### Tracking Templates
-
-You can define templates for fields that you collect often or as a group.  For example, you might define a template `running` which includes fields `duration`, `distance`, `heartrate`, `trail`, and `with`.
-
-Idea: Make the DSL grammar itself extensible?
+to remove the note at position 2 (see the numbers in brackets to the right of the arrows above?)
 
 ## Version Control
 
@@ -156,53 +67,37 @@ Idea: Make the DSL grammar itself extensible?
     notes git-log
     notes git-status
 
-## Security
-
-Notes supports security protocols involving encryption of notes, journalling, and tracked data.  The current implementation uses AES-256 with a different 256-bit key for each object (note, journal entry, or datum).  In the future, this may change to a public key-based scheme in order to allow easier access to the entire object set (for example, `search` only currently searches over unencrypted objects).  To create a protected object, use the -e flag:
-
-    notes new -e mynote
-    notes journal -e
-
-Currently, the AES IVs are generated using python's randint, which are NOT cryptographically strong.  The AES implementation is from PyCrypto (http://www.dlitz.net/software/pycrypto/).
-
 ## Full Usage
 
-(For my setup, where I'm using TextMate and less.)
+(For my setup, where I'm using Atom and less.)
 
     $ notes help
 
-     Editor is mate (secure: vim), pager is less.
+    Editor is atom, pager is less.
 
-     Usage: /usr/bin/notes [COMMAND]
+    Usage: notes [COMMAND]
 
-     Valid commands:
-       new <title> [-e]     Create a new note named <title> and open it in $EDITOR.
-       cat <title>          Display the content of <title> in $PAGER.
-       search <query>       Full text search for <query> in your notes tree.
-       list [-all]          List all titles in your notes tree. Optional flag -all prints full paths.
-       edit <title>         Open the note named <title> in $EDITOR.
+    Valid commands:
+     new <title>            Create a new note named <title> and open it in $EDITOR.
+     cat <title>            Display the content of <title> in $PAGER.
+     search <query>         Full text search for <query> in your notes tree.
+     list [-a]              List all titles in your notes tree. Optional flag -a prints full paths.
+     edit <title>           Open the note named <title> in $EDITOR.
+     journal                Create a new note with today's date as the title.
 
-       track <expr>         Log data for tracking.
+     stack                  View the current micronote stack.  Short form: s.
+     push <unote>           Push a micronote onto the active stack.
+     pop <idx>              Unset the micronote at position idx.
 
-       journal  [-e]        Create a new journal entry.
-       journal read         Open the journal file.
+     git-init               (Re-)Initialize version control in your notes tree.
+     git-commit             Commit the current state of your notes tree to version control.
+     git-log                View your version control commit log in $PAGER.
+     git-status             See the status of your notes tree with respect to unversioned changes.
 
-       stack                View the current micronote stack.
-       push <unote>         Push a micronote onto the active stack.
-       pop <idx>            Unset the micronote at position idx.
-
-       git-init             (Re-)Initialize version control in your notes tree.
-       git-commit           Commit the current state of your notes tree to version control.
-       git-log              View your version control commit log in $PAGER.
-       git-status           See the status of your notes tree with respect to unversioned changes.
-
-       help                 Display this help message and quit.
+     help                   Display this help message and quit.
 
     Optional arguments:
-       -e                   Encrypt using AES-256 with a 256 bit key.  Valid for: new, journal.
-       -all                 Print full paths.  Valid for: list.
-
-     Notes is maintained by Max Hodak <maxhodak@gmail.com>.  Please report issues at http://github.com/maxhodak/notes/issues/.
+     -a                     Print full paths.  Valid for: list.
 
 ## Other
 
