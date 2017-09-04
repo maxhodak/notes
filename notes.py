@@ -20,7 +20,7 @@ if notespath is None:
   else:
     print "Platform not recognized and $NOTESPATH not set.  Please set $NOTESPATH first."
     sys.exit(2)
-  os.system("touch %s/.notestack" % notespath)
+  os.system("touch %s/.stack" % notespath)
   print "$NOTESPATH not set; using default of %s" % notespath
   print "You should add `export NOTESPATH=%s` (or otherwise) to your shell profile." % notespath
 
@@ -195,9 +195,12 @@ def main(argv = None):
       print "Error!"
 
   elif argv[1] == 'journal':
-    path = "%s/%s" % (notespath, time.strftime("%Y/%m/%d"))
+    date = time.strftime("%Y/%m/%d")
+    if argv[2]:
+      date = argv[2]
+    path = "%s/%s" % (notespath, date)
     mkdir_p(path)
-    edit_note("%s/%s.mdown" % (path, time.strftime("%Y-%m-%d")))
+    edit_note("%s/%s.mdown" % (path, "daily"))
 
   elif argv[1] == 'scratch':
     edit_note("%s/.scratch.mdown" % (notespath,))
