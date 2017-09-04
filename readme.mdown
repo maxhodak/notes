@@ -84,6 +84,7 @@ to remove the note at position 2 (see the numbers in brackets to the right of th
      list [-a]              List all titles in your notes tree. Optional flag -a prints full paths.
      edit <title>           Open the note named <title> in $EDITOR.
      journal                Create a new note with today's date as the title.
+     scratch                Open the scratch pad.
 
      stack                  View the current micronote stack.  Short form: s.
      push <unote>           Push a micronote onto the active stack.

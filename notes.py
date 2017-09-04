@@ -136,6 +136,7 @@ def display_help(argv = sys.argv):
   print "    list [-a]              List all titles in your notes tree. Optional flag -a prints full paths."
   print "    edit <title>           Open the note named <title> in $EDITOR."
   print "    journal                Create a new note with today's date as the title."
+  print "    scratch                Open the scratch pad."
   print ""
   print "    stack                  View the current micronote stack.  Short form: s."
   print "    push <unote>           Push a micronote onto the active stack."
@@ -156,12 +157,12 @@ def display_help(argv = sys.argv):
 
 def load_stack(notespath):
   try:
-    return json.load(open("%s/.notestack" % notespath, 'r+'))
+    return json.load(open("%s/.stack" % notespath, 'r+'))
   except ValueError:
     return []
 
 def save_stack(notespath, stack = []):
-  return json.dump(stack, open("%s/.notestack" % notespath, 'w'))
+  return json.dump(stack, open("%s/.stack" % notespath, 'w'))
 
 def main(argv = None):
   if argv is None:
@@ -197,6 +198,9 @@ def main(argv = None):
     path = "%s/%s" % (notespath, time.strftime("%Y/%m/%d"))
     mkdir_p(path)
     edit_note("%s/%s.mdown" % (path, time.strftime("%Y-%m-%d")))
+
+  elif argv[1] == 'scratch':
+    edit_note("%s/.scratch.mdown" % (notespath,))
 
   elif argv[1] == 'new':
     path = "%s/%s" % (notespath,time.strftime("%Y/%m/%d"))
