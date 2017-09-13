@@ -8,4 +8,10 @@ setup(name='notes',
       author_email='maxhodak@gmail.com',
       license='MIT',
       packages=['notes'],
-      zip_safe=False)
+      entry_points = {
+        'console_scripts': [
+          'notes = notes.main:main',
+        ],
+      },
+      zip_safe=False
+)

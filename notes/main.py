@@ -1,7 +1,15 @@
 import os
 import sys
 import argparse
-from notes import basic, stack, journal
+from notes import basic, stack, journal, security
+
+def _description(argv = sys.argv):
+  return "A system for keeping notes. Editor is %s, pager is %s." % (
+    os.getenv('EDITOR'), os.getenv('PAGER')
+  )
+
+def _epilog():
+  return "Notes is maintained by Max Hodak <maxhodak@gmail.com>.  Please report issues at http://github.com/maxhodak/notes/issues/."
 
 def main():
     notespath = os.getenv("NOTESPATH")
@@ -17,20 +25,23 @@ def main():
       print "$NOTESPATH not set; using default of %s" % notespath
       print "You should add `export NOTESPATH=%s` (or otherwise) to your shell profile." % notespath
 
-    parser = argparse.ArgumentParser(description='notes')
-    parser.add_argument('--root', metavar='-r', type=str, default=notespath,
-                        help='Path to notes root directory')
-    subparsers = parser.add_subparsers(title='subcommands',
-                                       description='valid subcommands',
-                                       help='additional help')
+    parser = argparse.ArgumentParser(
+        description=_description(),
+        epilog=_epilog(),
+        formatter_class=lambda prog: argparse.HelpFormatter(prog,width=124)
+    )
+    parser.add_argument('--root', metavar='-r', type=str, default = notespath,
+                        help="Path to notes root directory (default: %s)" % notespath)
 
-    scratch = subparsers.add_parser('scratch', help="Open the scratch pad.")
+    subparsers = parser.add_subparsers(title='Commands')
 
     basic.add_commands(subparsers)
-    stack.add_commands(subparsers)
     journal.add_commands(subparsers)
+    stack.add_commands(subparsers)
+    security.add_commands(subparsers)
 
-    parser.parse_args()
+    args = parser.parse_args()
+    args.func(args)
 
 if __name__ == '__main__':
     main()

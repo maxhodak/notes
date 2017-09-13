@@ -2,7 +2,7 @@
 
 ## Basic Use: Keeping track of notes
 
-A note is just a textfile identified by a name.  To create a new note,
+A note is just a text file identified by a name.  To create a new note,
 
     $ notes new mynote
 
@@ -13,9 +13,9 @@ and your editor will open with a blank file.  Save will commit to disk in the ri
 Note that `edit` and `new` are two different things!  Under the hood, notes keep track of metadata like creation date and `new` will create a `new` file under the current day's directory.  If you have multiple notes with the same name from different days, you'll get a disambiguation prompt:
 
     Multiple matches for mynotename found:
-      idx   enc    Name
-       0    False  /Users/maxhodak/Documents/Notes/2010/11/03/mynotename.mdown
-       1    True   /Users/maxhodak/Documents/Notes/2010/11/28/mynotename.mdown
+      idx   Name
+       0    /Users/maxhodak/Documents/Notes/2010/11/03/mynotename.mdown
+       1    /Users/maxhodak/Documents/Notes/2010/11/28/mynotename.mdown
 
       Select an index:
 
