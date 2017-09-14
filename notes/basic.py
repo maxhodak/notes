@@ -5,6 +5,11 @@ from notes import fs, edit, security, search
 def add_commands(subparsers):
   a = subparsers.add_parser('new', help='Create a new note named <title> and open it in $EDITOR.')
   a.add_argument('title', type=str)
+  a.add_argument('--date', metavar='-d',
+    type=str,
+    default=time.strftime("%Y/%m/%d"),
+    help='Date to file under (default: %s)' % time.strftime("%Y/%m/%d")
+  )
   a.set_defaults(func = _new)
 
   a = subparsers.add_parser('cat', help='Display the content of <title> in $PAGER.')
@@ -37,7 +42,7 @@ def find_note_by_name(args, name):
 
 def _new(args):
   key = security.keyfile_read(args)
-  path = "%s/%s" % (args.root, time.strftime("%Y/%m/%d"))
+  path = "%s/%s" % (args.root, args.date)
   fs.mkdir_p(path)
   edit.with_editor("%s/%s.mdown" % (path, args.title), key)
 

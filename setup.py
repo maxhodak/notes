@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='notes',
-      version='1.2',
+      version='1.2.1',
       description='A system for keeping notes',
       url='https://github.com/maxhodak/notes',
       author='Max Hodak',
