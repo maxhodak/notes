@@ -24,4 +24,4 @@ def _status(args):
 
 def _commit(args):
     os.system("cd %s && git status --porcelain -uall | grep '^??' | cut -d' ' -f2 | xargs git add" % args.root)
-    os.system("cd %s && git commit -a" % (args.root, commit_msg))
+    os.system("cd %s && git commit -a" % (args.root,))
