@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='notes',
-      version='0.1',
+      version='1.2',
       description='A system for keeping notes',
       url='https://github.com/maxhodak/notes',
       author='Max Hodak',
@@ -11,7 +11,7 @@ setup(name='notes',
       entry_points = {
         'console_scripts': [
           'notes = notes.main:main',
+          'note = notes.main:main',
         ],
       },
-      zip_safe=False
-)
+      zip_safe=False)

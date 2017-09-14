@@ -1,7 +1,5 @@
 # Notes
 
-## Basic Use: Keeping track of notes
-
 A note is just a text file identified by a name.  To create a new note,
 
     $ notes new mynote
@@ -19,21 +17,9 @@ Note that `edit` and `new` are two different things!  Under the hood, notes keep
 
       Select an index:
 
-Notes does not support multiple notes with same name on the same day.  To search your existing notes for a string:
+Notes does not support multiple notes with same name on the same day.
 
-    $ notes search "Some String"
-
-You can also delete a note:
-
-    $ notes delete mynotename
-
-though make sure you're using the version control features properly unless you really want to lose data.
-
-Finally, to get a list of all of your notes, you can use:
-
-    $ notes list
-
-the long form of the list command, `notes list -a` is especially useful for piping to other command that operate on your notefiles.
+To delete a note, just use `rm` on a regular command line. (There is no way to delete a file using notes.)
 
 ## Stack: miniature task tracking and reminders
 
@@ -55,51 +41,65 @@ appends it.  To remove an item,
 
 removes the most-recently-inserted item. You can also specify a position:
 
-    $ note pop 2
+    $ note pop -x 2
 
 to remove the note at position 2 (see the numbers in brackets to the right of the arrows above?)
+
+## Journal & Scratchpad
+
+Notes has a first-class concepts for a few common idioms.
+
+    $ notes scratch
+
+Will open a persistent document to use as a scratch file.
+
+    $ notes journal
+
+Will put a `daily.mdown` file in the current day's directory. You can use a `--date` argument to specify a day other than today.
 
 ## Version Control
 
     notes git-init
-    notes git-add
-    notes git-commit
-    notes git-log
-    notes git-status
+    notes checkpoint
+    notes log
+    notes status
+
+## Encryption
+
+All notes are encrypted as separate files. Importantly, as of now, titles are filenames and are themselves not encrypted. For details on what kind of encryption notes uses, see `notes/security.py`.
 
 ## Full Usage
 
 (For my setup, where I'm using Atom and less.)
 
-    $ notes help
+    $ notes -h
 
-    Editor is atom, pager is less.
+    A system for keeping notes. Editor is atom --wait, pager is less.
 
-    Usage: notes [COMMAND]
+    optional arguments:
+      -h, --help            show this help message and exit
+      --root -r             Path to notes root directory (default: /Users/maxhodak/Documents/Notes)
 
-    Valid commands:
-     new <title>            Create a new note named <title> and open it in $EDITOR.
-     cat <title>            Display the content of <title> in $PAGER.
-     search <query>         Full text search for <query> in your notes tree.
-     list [-a]              List all titles in your notes tree. Optional flag -a prints full paths.
-     edit <title>           Open the note named <title> in $EDITOR.
-     journal                Create a new note with today's date as the title.
-     scratch                Open the scratch pad.
+    Commands:
+      {new,cat,list,edit,scratch,search,journal,stack,push,pop,key,git-init,commit,log,status}
+        new                 Create a new note named <title> and open it in $EDITOR.
+        cat                 Display the content of <title> in $PAGER.
+        list                List all titles in your notes tree. Optional flag -a prints full paths.
+        edit                Open the note named <title> in $EDITOR
+        scratch             Open the scratch pad
+        search              Full text search for <query> in your notes tree.
+        journal             Create a new note with today's date as the title.
+        stack               View the current stack
+        push                Push an item onto the stack
+        pop                 Pop an item from the stack
+        key                 Inspect the keyfile
+        git-init            Initialize version control in your notes tree.
+        commit              Commit the current state of your notes tree to version control.
+        log                 View your version control commit log in $PAGER.
+        status              See the status of your notes tree with respect to unversioned changes.
 
-     stack                  View the current micronote stack.  Short form: s.
-     push <unote>           Push a micronote onto the active stack.
-     pop <idx>              Unset the micronote at position idx.
-
-     git-init               (Re-)Initialize version control in your notes tree.
-     git-commit             Commit the current state of your notes tree to version control.
-     git-log                View your version control commit log in $PAGER.
-     git-status             See the status of your notes tree with respect to unversioned changes.
-
-     help                   Display this help message and quit.
-
-    Optional arguments:
-     -a                     Print full paths.  Valid for: list.
+    Notes is maintained by Max Hodak <maxhodak@gmail.com>. Please report issues at http://github.com/maxhodak/notes/issues/.
 
 ## Other
 
-Keeps your notes in `$NOTESPATH/%Y/%m/%d/<name>.mdown`; if not set, `$NOTESPATH` defaults to either `/Users/&lt;username&gt;/Documents/Notes/` or `/home/&lt;username&gt;/notes`, depending on platform.  Notes also creates a symlink aliasing `note` to `notes`, so you can use either; some of the commands just feel more natural after 'note', singular.
+Notes keeps your data in `$NOTESPATH/%Y/%m/%d/<name>.mdown`; if not set, `$NOTESPATH` defaults to either `/Users/<username>/Documents/Notes/` or `/home/<username>/notes`, depending on platform.  Notes also creates a symlink aliasing `note` to `notes`, so you can use either; some of the commands just feel more natural after 'note', singular.

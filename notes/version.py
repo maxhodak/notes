@@ -4,7 +4,7 @@ from notes import fs
 def add_commands(subparsers):
     a = subparsers.add_parser('git-init', help='Initialize version control in your notes tree.')
     a.set_defaults(func = _git_init)
-    a = subparsers.add_parser('commit', help='Commit the current state of your notes tree to version control.')
+    a = subparsers.add_parser('checkpoint', help='Commit the current state of your notes tree to version control.')
     a.set_defaults(func = _commit)
     a = subparsers.add_parser('log', help='View your version control commit log in $PAGER.')
     a.set_defaults(func = _git_log)
