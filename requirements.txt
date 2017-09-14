@@ -1,2 +1,1 @@
 cryptography
-touchid==1.2.0
