@@ -45,6 +45,14 @@ removes the most-recently-inserted item. You can also specify a position:
 
 to remove the note at position 2 (see the numbers in brackets to the right of the arrows above?)
 
+I usually define several shell aliases for this feature:
+
+    alias push='notes push'
+    alias pop='notes pop'
+    alias peek='notes stack'
+
+which make it even fewer keystrokes to use the stack.
+
 ## Journal & Scratchpad
 
 Notes has a first-class concepts for a few common idioms.
@@ -55,7 +63,7 @@ Will open a persistent document to use as a scratch file.
 
     $ notes journal
 
-Will put a `daily.mdown` file in the current day's directory. You can use a `--date` argument to specify a day other than today.
+Will put a `daily.mdown` file in the current day's directory. You can use a `--date` argument to specify a day other than today. This is equivalent to calling `notes new daily --date YYYY/MM/dd`
 
 ## Version Control
 
