@@ -29,11 +29,11 @@ Programmers often refer to having a mental stack.
 
     ==> [0] Get correct answers for BME 153 homework
     ==> [1] Go running
-    ==> [2] Send back to proposal for Widgets
+    ==> [2] Negotiate seat to Mars
 
 To add a new item:
 
-    $ note push Adding a new item!
+    $ note push "Adding a new item!"
 
 appends it.  To remove an item,
 
@@ -67,7 +67,7 @@ Will put a `daily.mdown` file in the current day's directory. You can use a `--d
 
 ## Blockchain Notary
 
-Notes can publish hashes of your content to the Ethereum blockchain as a form of secure proof-of-existence timestamping.  All hashes are calculated on the plaintext of your note content, not the encrypted resting contents on the files. To just see the SHA256 hash of a note without publishing anything:
+Notes can publish hashes of your content to the Ethereum blockchain as a form of secure proof-of-existence timestamping.  All hashes are calculated on the plaintext of your note content, not the encrypted resting contents of the files. To just see the SHA256 hash of a note without publishing anything:
 
     $ notes hash NoteTitle
 
@@ -78,6 +78,8 @@ To publish a hash to the Ethereum blockchain:
 In order to use this feature, you must be running an Ethereum client with an RPC server that exposes the eth, web3, and personal APIs, for example:
 
     $ geth --syncmode "light" --cache 1024 --rpcapi eth,web3,personal --rpc
+
+It's a good idea to commit a checkpoint when you notarize a file so you can recover the state the hash corresponds to later, in case that note is edited further.
 
 ## Version Control
 
