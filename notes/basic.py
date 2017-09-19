@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 from notes import fs, edit, security, search
 
@@ -38,6 +39,9 @@ def find_note_by_name(args, name):
     selection = raw_input("  Select an index: ")
     print ""
     return files[int(selection)]
+  if len(files) == 0:
+    print("No matching files found! Exiting.")
+    sys.exit(1)
   return files[0]
 
 def _new(args):
