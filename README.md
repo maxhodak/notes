@@ -1,5 +1,11 @@
 # Notes
 
+A highly hackable system for keeping notes that includes a lightweight command line-based task tracker and some advanced features like an Ethereum blockchain notary and git integration, all of which is encrypted by default and kept on your own file system. Notes uses whatever editor and pager you use normally, like vim or Atom and more or less.
+
+Notes exists because the text flow I use for development works just as good for non-code as it does for code, which is to say, much better than a WYSIWYG editor; being able to easily extend and integrate my note management tooling with other stuff has been super useful over the years; and Evernote is eventually going to get hacked.
+
+## Basic Use
+
 A note is just a text file identified by a name.  To create a new note,
 
     $ notes new mynote
@@ -51,8 +57,6 @@ I usually define several shell aliases for this feature:
     alias pop='notes pop'
     alias peek='notes stack'
 
-which make it even fewer keystrokes to use the stack.
-
 ## Journal & Scratchpad
 
 Notes has a first-class concepts for a few common idioms.
@@ -100,17 +104,17 @@ All notes are encrypted as separate files. Importantly, as of now, titles are fi
     $ notes -h
 
     usage: notes [-h] [--root -r]
-                 {new,cat,list,edit,scratch,search,journal,stack,push,pop,key,git-init,checkpoint,log,status,version,hash,notarize}
+                 {new,cat,list,edit,scratch,search,journal,stack,push,pop,key,git-init,checkpoint,log,status,version,hash,notarize,notarize_raw}
                  ...
 
     A system for keeping notes. Editor is atom --wait, pager is less.
 
     optional arguments:
       -h, --help            show this help message and exit
-      --root -r             Path to notes root directory (default: /Users/maxhodak/Documents/Notes)
+      --root -r             Path to notes root directory (default: /home/max/notes)
 
     Commands:
-      {new,cat,list,edit,scratch,search,journal,stack,push,pop,key,git-init,checkpoint,log,status,version,hash,notarize}
+      {new,cat,list,edit,scratch,search,journal,stack,push,pop,key,git-init,checkpoint,log,status,version,hash,notarize,notarize_raw}
         new                 Create a new note named <title> and open it in $EDITOR
         cat                 Display the content of <title> in $PAGER
         list                List all titles in your notes tree
@@ -129,8 +133,10 @@ All notes are encrypted as separate files. Importantly, as of now, titles are fi
         version             See the current commit hash
         hash                Calculate SHA256 of note plaintext
         notarize            Publish a SHA256 hash to the Ethereum blockchain as a proof-of-existence timestamp
+        notarize_raw        Publish an arbitrary string to the Ethereum blockchain as a proof-of-existence timestamp
 
     Notes is maintained by Max Hodak <maxhodak@gmail.com>. Please report issues at http://github.com/maxhodak/notes/issues/.
+
 ## Other
 
 Notes keeps your data in `$NOTESPATH/%Y/%m/%d/<name>.mdown`; if not set, `$NOTESPATH` defaults to either `/Users/<username>/Documents/Notes/` or `/home/<username>/notes`, depending on platform.  Notes also creates a symlink aliasing `note` to `notes`, so you can use either; some of the commands just feel more natural after 'note', singular.
