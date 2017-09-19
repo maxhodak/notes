@@ -2,7 +2,7 @@ import os
 from glob import glob
 
 def add_commands(subparsers):
-    a = subparsers.add_parser('search', help='Full text search for <query> in your notes tree.')
+    a = subparsers.add_parser('search', help='Full text search for <query> in your notes tree')
     a.add_argument('query', type=str)
     a.set_defaults(func = _search)
 

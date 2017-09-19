@@ -65,12 +65,27 @@ Will open a persistent document to use as a scratch file.
 
 Will put a `daily.mdown` file in the current day's directory. You can use a `--date` argument to specify a day other than today. This is equivalent to calling `notes new daily --date YYYY/MM/dd`
 
+## Blockchain Notary
+
+Notes can publish hashes of your content to the Ethereum blockchain as a form of secure proof-of-existence timestamping.  All hashes are calculated on the plaintext of your note content, not the encrypted resting contents on the files. To just see the SHA256 hash of a note without publishing anything:
+
+    $ notes hash NoteTitle
+
+To publish a hash to the Ethereum blockchain:
+
+    $ notes notarize NoteTitle
+
+In order to use this feature, you must be running an Ethereum client with an RPC server that exposes the eth, web3, and personal APIs, for example:
+
+    $ geth --syncmode "light" --cache 1024 --rpcapi eth,web3,personal --rpc
+
 ## Version Control
 
     notes git-init
     notes checkpoint
     notes log
     notes status
+    notes version
 
 ## Encryption
 
@@ -82,6 +97,10 @@ All notes are encrypted as separate files. Importantly, as of now, titles are fi
 
     $ notes -h
 
+    usage: notes [-h] [--root -r]
+                 {new,cat,list,edit,scratch,search,journal,stack,push,pop,key,git-init,checkpoint,log,status,version,hash,notarize}
+                 ...
+
     A system for keeping notes. Editor is atom --wait, pager is less.
 
     optional arguments:
@@ -89,25 +108,27 @@ All notes are encrypted as separate files. Importantly, as of now, titles are fi
       --root -r             Path to notes root directory (default: /Users/maxhodak/Documents/Notes)
 
     Commands:
-      {new,cat,list,edit,scratch,search,journal,stack,push,pop,key,git-init,commit,log,status}
-        new                 Create a new note named <title> and open it in $EDITOR.
-        cat                 Display the content of <title> in $PAGER.
-        list                List all titles in your notes tree. Optional flag -a prints full paths.
+      {new,cat,list,edit,scratch,search,journal,stack,push,pop,key,git-init,checkpoint,log,status,version,hash,notarize}
+        new                 Create a new note named <title> and open it in $EDITOR
+        cat                 Display the content of <title> in $PAGER
+        list                List all titles in your notes tree
         edit                Open the note named <title> in $EDITOR
         scratch             Open the scratch pad
-        search              Full text search for <query> in your notes tree.
-        journal             Create a new note with today's date as the title.
+        search              Full text search for <query> in your notes tree
+        journal             Create a new note with today's date as the title
         stack               View the current stack
         push                Push an item onto the stack
         pop                 Pop an item from the stack
         key                 Inspect the keyfile
-        git-init            Initialize version control in your notes tree.
-        commit              Commit the current state of your notes tree to version control.
-        log                 View your version control commit log in $PAGER.
-        status              See the status of your notes tree with respect to unversioned changes.
+        git-init            Initialize version control in your notes tree
+        checkpoint          Commit the current state of your notes tree to version control
+        log                 View your version control commit log in $PAGER
+        status              See the status of your notes tree with respect to unversioned changes
+        version             See the current commit hash
+        hash                Calculate SHA256 of note plaintext
+        notarize            Publish a SHA256 hash to the Ethereum blockchain as a proof-of-existence timestamp
 
     Notes is maintained by Max Hodak <maxhodak@gmail.com>. Please report issues at http://github.com/maxhodak/notes/issues/.
-
 ## Other
 
 Notes keeps your data in `$NOTESPATH/%Y/%m/%d/<name>.mdown`; if not set, `$NOTESPATH` defaults to either `/Users/<username>/Documents/Notes/` or `/home/<username>/notes`, depending on platform.  Notes also creates a symlink aliasing `note` to `notes`, so you can use either; some of the commands just feel more natural after 'note', singular.

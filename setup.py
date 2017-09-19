@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='notes',
-      version='1.2.1',
+      version='1.3.0',
       description='A system for keeping notes',
       url='https://github.com/maxhodak/notes',
       author='Max Hodak',
@@ -14,4 +14,8 @@ setup(name='notes',
           'note = notes.main:main',
         ],
       },
+      install_requires = [
+        'cryptography',
+        'web3'
+      ],
       zip_safe=False)

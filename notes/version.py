@@ -2,14 +2,16 @@ import os
 from notes import fs
 
 def add_commands(subparsers):
-    a = subparsers.add_parser('git-init', help='Initialize version control in your notes tree.')
+    a = subparsers.add_parser('git-init', help='Initialize version control in your notes tree')
     a.set_defaults(func = _git_init)
-    a = subparsers.add_parser('checkpoint', help='Commit the current state of your notes tree to version control.')
+    a = subparsers.add_parser('checkpoint', help='Commit the current state of your notes tree to version control')
     a.set_defaults(func = _commit)
-    a = subparsers.add_parser('log', help='View your version control commit log in $PAGER.')
+    a = subparsers.add_parser('log', help='View your version control commit log in $PAGER')
     a.set_defaults(func = _git_log)
-    a = subparsers.add_parser('status', help='See the status of your notes tree with respect to unversioned changes.')
+    a = subparsers.add_parser('status', help='See the status of your notes tree with respect to unversioned changes')
     a.set_defaults(func = _status)
+    a = subparsers.add_parser('version', help='See the current commit hash')
+    a.set_defaults(func = _version)
 
 def _git_init(args):
     fs.mkdir_p(notespath)
@@ -25,3 +27,6 @@ def _status(args):
 def _commit(args):
     os.system("cd %s && git status --porcelain -uall | grep '^??' | cut -d' ' -f2 | xargs git add" % args.root)
     os.system("cd %s && git commit -a" % (args.root,))
+
+def _version(args):
+    os.system("cd %s && git rev-parse HEAD" % args.root)

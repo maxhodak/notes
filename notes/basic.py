@@ -3,7 +3,7 @@ import time
 from notes import fs, edit, security, search
 
 def add_commands(subparsers):
-  a = subparsers.add_parser('new', help='Create a new note named <title> and open it in $EDITOR.')
+  a = subparsers.add_parser('new', help='Create a new note named <title> and open it in $EDITOR')
   a.add_argument('title', type=str)
   a.add_argument('--date', metavar='-d',
     type=str,
@@ -12,11 +12,11 @@ def add_commands(subparsers):
   )
   a.set_defaults(func = _new)
 
-  a = subparsers.add_parser('cat', help='Display the content of <title> in $PAGER.')
+  a = subparsers.add_parser('cat', help='Display the content of <title> in $PAGER')
   a.add_argument('title', type=str)
   a.set_defaults(func = _cat)
 
-  a = subparsers.add_parser('list', help='List all titles in your notes tree. Optional flag -a prints full paths.')
+  a = subparsers.add_parser('list', help='List all titles in your notes tree')
   a.add_argument('--all', dest='all', action='store_true')
   a.set_defaults(func = _list, all = False)
 

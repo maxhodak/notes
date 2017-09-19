@@ -2,7 +2,7 @@ import os
 import sys
 import argparse
 
-from notes import basic, search, stack, journal, security, version
+from notes import basic, search, stack, journal, security, version, verify
 
 def _description(argv = sys.argv):
   return "A system for keeping notes. Editor is %s, pager is %s." % (
@@ -46,6 +46,7 @@ def main():
     stack.add_commands(subparsers)
     security.add_commands(subparsers)
     version.add_commands(subparsers)
+    verify.add_commands(subparsers)
 
     args = parser.parse_args()
     args.func(args)
