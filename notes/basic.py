@@ -1,6 +1,9 @@
 import os
 import sys
 import time
+
+import dateutil.parser as dparser
+
 from notes import fs, edit, security, search
 
 def add_commands(subparsers):
@@ -19,7 +22,9 @@ def add_commands(subparsers):
 
   a = subparsers.add_parser('list', help='List all titles in your notes tree')
   a.add_argument('--all', dest='all', action='store_true')
-  a.set_defaults(func = _list, all = False)
+  a.add_argument('--include-daily', dest='include_daily', action='store_true')
+  a.add_argument('--dates', dest='show_dates', action='store_true')
+  a.set_defaults(func = _list, all = False, include_daily = False, show_dates = False)
 
   a = subparsers.add_parser('edit', help='Open the note named <title> in $EDITOR')
   a.add_argument('title', type=str)
@@ -55,10 +60,26 @@ def _scratch(args):
   edit.with_editor("%s/.scratch.mdown" % (args.root,), key)
 
 def _list(args):
-  if args.all:
-    os.system("find %s/2* -name '*.mdown'" % args.root)
-  else:
-    os.system("find %s/2* -name '*.mdown' | cut -d '/' -f 9 | cut -d '.' -f 1" % args.root)
+  files = search.list_files(args)
+
+  def _extract_date(filename):
+      return dparser.parse(filename, fuzzy = True)
+
+  def _normalize_filename(filename):
+      if not args.include_daily and filename.endswith("daily.mdown"):
+          return None
+      if args.all:
+          return filename
+      filename = os.path.basename(filename)
+      return os.path.splitext(filename)[0] # remove extension
+
+  for filename in files:
+      normalized = _normalize_filename(filename)
+      if None == normalized:
+          continue
+      if True == args.show_dates:
+          normalized = "%s  %s" % (_extract_date(filename).strftime("%Y/%m/%d"), normalized) 
+      print(normalized)
 
 def _edit(args):
   key = security.keyfile_read(args)
