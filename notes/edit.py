@@ -16,7 +16,7 @@ def with_editor(filename, key, command = ["atom", "--wait"]):
     except:
         was_migrated = migrate(filename, key, leave_decrypted = True)
         if not was_migrated:
-            print "File exists but could not be read!"
+            print("File exists but could not be read!")
             return False
 
   subprocess.call(command + [filename])
@@ -36,7 +36,7 @@ def with_function(filename, key, function):
     except:
         was_migrated = migrate(filename, key, leave_decrypted = True)
         if not was_migrated:
-            print "File exists but could not be read!"
+            print("File exists but could not be read!")
             return False
 
   data = None

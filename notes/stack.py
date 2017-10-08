@@ -22,7 +22,7 @@ def save_stack(args, stack = []):
 def _stack(args):
     data = load_stack(args)
     for i in xrange(len(data)):
-      print " ==> [%i] %s" % (i, data[i])
+      print(" ==> [%i] %s" % (i, data[i]))
 
 def _push(args):
     data = load_stack(args)
@@ -37,8 +37,8 @@ def _pop(args):
       del data[args.x]
       save_stack(args, data)
     elif not args.x:
-      print " ==> %s" % (data[-1], )
+      print(" ==> %s" % (data[-1], ))
       del data[-1]
       save_stack(args, data)
     else:
-      print "Bad index: %d (stack size = %d)" % (args.x, len(data))
+      print("Bad index: %d (stack size = %d)" % (args.x, len(data)))

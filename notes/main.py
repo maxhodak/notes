@@ -20,11 +20,11 @@ def _get_default_root():
       elif sys.platform in ("linux2"):
         notespath = "/home/%s/notes" % os.getlogin()
       else:
-        print "Platform not recognized and $NOTESPATH not set.  Please set $NOTESPATH first."
+        print("Platform not recognized and $NOTESPATH not set.  Please set $NOTESPATH first.")
         sys.exit(2)
       os.system("touch %s/.stack" % notespath)
-      print "$NOTESPATH not set; using default of %s" % notespath
-      print "You should add `export NOTESPATH=%s` (or otherwise) to your shell profile." % notespath
+      print("$NOTESPATH not set; using default of %s" % notespath)
+      print("You should add `export NOTESPATH=%s` (or otherwise) to your shell profile." % notespath)
     return notespath
 
 def main():

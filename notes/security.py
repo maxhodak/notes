@@ -19,7 +19,7 @@ def add_commands(subparsers):
 
 def _show_key(args):
     key = keyfile_read(args)
-    print "Key ok!"
+    print("Key ok!")
 
 def keyfile_new(args):
     global KEYFILE_ACTIVE
@@ -108,6 +108,6 @@ def decrypt(ciphertext, salt, password, b64 = True):
         else:
             data = f.decrypt(ciphertext)
     except InvalidToken:
-        print "Bad password!"
+        print("Bad password!")
         sys.exit(1)
     return data

@@ -24,7 +24,7 @@ def _hash(args, return_values = False):
     filename = basic.find_note_by_name(args, args.note)
 
     if filename is False:
-      print "Error: Object by name %s not found." % args.note
+      print("Error: Object by name %s not found." % args.note)
       return
 
     hash_data = edit.with_function(filename, key, _calculate_hash)

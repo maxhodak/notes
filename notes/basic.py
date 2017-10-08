@@ -36,13 +36,13 @@ def add_commands(subparsers):
 def find_note_by_name(args, name):
   files = [x for x in search.list_files(args) if name in x]
   if len(files) > 1:
-    print "Multiple matches for %s found:" % name
-    print "  idx\t\tName"
+    print("Multiple matches for %s found:" % name)
+    print("  idx\t\tName")
     for ix in range(len(files)):
-      print "   %d\t%s" % (ix, files[ix])
-    print ""
+      print("   %d\t%s" % (ix, files[ix]))
+    print("")
     selection = raw_input("  Select an index: ")
-    print ""
+    print("")
     return files[int(selection)]
   if len(files) == 0:
     print("No matching files found! Exiting.")
@@ -73,19 +73,19 @@ def _list(args):
       filename = os.path.basename(filename)
       return os.path.splitext(filename)[0] # remove extension
 
-  for filename in files:
+  for filename in sorted(files, key = lambda x: _extract_date(x)):
       normalized = _normalize_filename(filename)
       if None == normalized:
           continue
       if True == args.show_dates:
-          normalized = "%s  %s" % (_extract_date(filename).strftime("%Y/%m/%d"), normalized) 
+          normalized = "%s  %s" % (_extract_date(filename).strftime("%Y/%m/%d"), normalized)
       print(normalized)
 
 def _edit(args):
   key = security.keyfile_read(args)
   filename = find_note_by_name(args, args.title)
   if filename is False:
-    print "Error: Object by name %s not found." % args.title
+    print("Error: Object by name %s not found." % args.title)
     return
   edit.with_editor(filename, key)
 
@@ -93,6 +93,6 @@ def _cat(args):
   key = security.keyfile_read(args)
   filename = find_note_by_name(args, args.title)
   if filename is False:
-    print "Error: Object by name %s not found." % argv[2]
+    print("Error: Object by name %s not found." % argv[2])
     return
   edit.with_editor(filename, key, command = ['less'])
