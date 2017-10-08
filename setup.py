@@ -16,7 +16,7 @@ setup(name='notes',
       },
       install_requires = [
         'cryptography',
-        'web3',
+        'web3==3.14.0',
         'python-dateutil'
       ],
       zip_safe=False)
