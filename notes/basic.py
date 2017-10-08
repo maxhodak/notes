@@ -63,7 +63,7 @@ def _list(args):
   files = search.list_files(args)
 
   def _extract_date(filename):
-      return dparser.parse(filename, fuzzy = True)
+      return dparser.parse(os.path.dirname(filename), fuzzy = True)
 
   def _normalize_filename(filename):
       if not args.include_daily and filename.endswith("daily.mdown"):
@@ -73,12 +73,12 @@ def _list(args):
       filename = os.path.basename(filename)
       return os.path.splitext(filename)[0] # remove extension
 
-  for filename in files:
+  for filename in sorted(files, key = lambda x: _extract_date(x)):
       normalized = _normalize_filename(filename)
       if None == normalized:
           continue
       if True == args.show_dates:
-          normalized = "%s  %s" % (_extract_date(filename).strftime("%Y/%m/%d"), normalized) 
+          normalized = "%s  %s" % (_extract_date(filename).strftime("%Y/%m/%d"), normalized)
       print(normalized)
 
 def _edit(args):
