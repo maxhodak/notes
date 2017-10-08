@@ -52,6 +52,8 @@ def keyfile_read(args):
     return keyfile_new(args)
   password = getpass.getpass("Password: ")
   data['decrypt_key'] = decrypt(data['key'], data['salt'], password)
+  # decrypted as a utf-8 string, must convert to bytes to use it as a key
+  data['decrypt_key'] = data['decrypt_key'].encode('utf8')
 
   KEYFILE_ACTIVE = data
 
@@ -63,14 +65,14 @@ def keyfile_save(args, data):
 def in_place_decrypt(filename, key):
   with open(filename, 'r') as f:
     data = json.load(f)
-    plaintext = decrypt(data['data'], data['salt'], key['decrypt_key'])
-  with open(filename, 'w') as f:
+    plaintext = decrypt(data['data'].encode("ascii"), data['salt'], key['decrypt_key'].decode('utf8'), False)
+  with open(filename, 'w', encoding='utf8') as f:
     f.write(plaintext)
 
 def in_place_encrypt(filename, key):
   with open(filename, 'r') as fd:
     salt, ciphertext = encrypt(key['decrypt_key'], fd.read())
-  with open(filename, 'wb') as fd:
+  with open(filename, 'w', encoding='ascii') as fd:
     json.dump({
       "salt": salt,
       "data": ciphertext
@@ -82,7 +84,7 @@ def encrypt(password, text, is_password = True):
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
-            salt=bytes(salt),
+            salt=salt,
             iterations=100000,
             backend=default_backend()
         )
@@ -90,24 +92,31 @@ def encrypt(password, text, is_password = True):
     else:
         key = password
     f = Fernet(key)
-    return (salt, base64.urlsafe_b64encode(f.encrypt(bytes(text))))
+    # convert utf-8 plaintext string to bytes and encrypt
+    ciphertext = f.encrypt(bytes(text, 'utf8'))
+    # ciphertext and salt are returned as a byte array of base64-encoded data.
+    # convert to ascii (guaranteed to be safe for base64) to write out.
+    return (salt.decode('ascii'), ciphertext.decode('ascii'))
 
 def decrypt(ciphertext, salt, password, b64 = True):
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
-        salt=bytes(salt),
+        salt=bytes(salt, 'ascii'),
         iterations=100000,
         backend=default_backend()
     )
-    key = base64.urlsafe_b64encode(kdf.derive(password))
+    key = base64.urlsafe_b64encode(kdf.derive(bytes(password, 'ascii')))
     f = Fernet(key)
     try:
         if b64:
-            data = f.decrypt(base64.urlsafe_b64decode(ciphertext.encode("ascii")))
+            # convert to bytes
+            encoded = ciphertext.encode("ascii")
+            decoded = base64.urlsafe_b64decode(encoded)
+            data = f.decrypt(decoded)
         else:
             data = f.decrypt(ciphertext)
     except InvalidToken:
         print("Bad password!")
         sys.exit(1)
-    return data
+    return data.decode("utf8")

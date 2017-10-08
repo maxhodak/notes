@@ -10,5 +10,5 @@ def mkdir_p(path):
     else: raise
 
 def touch(fname, times = None):
-  with file(fname, 'a'):
+  with open(fname, 'a'):
     os.utime(fname, times)

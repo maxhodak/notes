@@ -11,13 +11,13 @@ def with_editor(filename, key, command = ["atom", "--wait"]):
   fs.touch(filename)
 
   if file_exists is True: # else, leave as blank file (accomplished by fs.touch above)
-    try:
-        in_place_decrypt(filename, key)
-    except:
-        was_migrated = migrate(filename, key, leave_decrypted = True)
-        if not was_migrated:
-            print("File exists but could not be read!")
-            return False
+    # try:
+    in_place_decrypt(filename, key)
+    # except:
+    #     was_migrated = migrate(filename, key, leave_decrypted = True)
+    #     if not was_migrated:
+    #         print("File exists but could not be read!")
+    #         return False
 
   subprocess.call(command + [filename])
 
